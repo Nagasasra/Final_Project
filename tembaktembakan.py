@@ -395,7 +395,9 @@ while not exiting:
         screen.blit(p1_health, (screen_width // 30, screen_height // 10))
         screen.blit(p2_health, (screen_width - 30 - p2_health.get_width(), screen_height // 10))
 
-    # during a pause the program will displays the controls and the objectives of the game in case the players forget
+    # during a pause the program will displays various buttons such as resume, restart, instructions, and exit
+    # clicking resume will unpause it, clicking restart will reset everything and start the game all over again
+    # an image containing the controls and the objectives of the game will show up if instructions is clicked, clicking exit will close the game for good
     # the game will be halted when paused, you can't move or fire or anything
     # press esc key again to unpause to resume the game
     if paused is True and how_to is False:
