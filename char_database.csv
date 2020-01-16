@@ -2,5 +2,6 @@ name,jumping,filepath1,filepath1move1,filepath1move2,filepath2,filepath2move1,fi
 Chubby-Bird,100,images\bird1.png,images\bird1r1.png,images\bird1r2.png,images\bird2.png,images\bird2l1.png,images\bird2l2.png,2,2,80,80,120
 Legless Wizard,130,images\wizard1.png,images\wizard1.png,images\wizard1.png,images\wizard2.png,images\wizard2.png,images\wizard2.png,2,2,50,70,90
 Stickman,140,images\stickman1.png,images\stickman1r1.png,images\stickman1r2.png,images\stickman2.png,images\stickman2l1.png,images\stickman2l2.png,3,2,60,25,100
-Policeman,90,images\policeman1.png,images\policeman1r1.png,images\policeman1r2.png,images\policeman2.png,images\policeman2l1.png,images\policeman2l2.png,2,2,70,60,140
-Soldier,100,images\soldier1.png,images\soldier1r1.png,images\soldier1r2.png,images\soldier2.png,images\soldier2l1.png,images\soldier2l2.png,2,2,90,70,130
+Obese Policeman,90,images\policeman1.png,images\policeman1r1.png,images\policeman1r2.png,images\policeman2.png,images\policeman2l1.png,images\policeman2l2.png,2,2,70,60,140
+Hardened Soldier,100,images\soldier1.png,images\soldier1r1.png,images\soldier1r2.png,images\soldier2.png,images\soldier2l1.png,images\soldier2l2.png,2,2,90,70,130
+Kyudo Archer,130,images\kyudo1.png,images\kyudo1r1.png,images\kyudo1r2.png,images\kyudo2.png,images\kyudo2l1.png,images\kyudo2l2.png,3,2,60,40,80

@@ -138,12 +138,12 @@ p1_standing_reversed = pygame.image.load(p1.get_image2()[0]).convert_alpha()
 p2_standing_reversed = pygame.image.load(p2.get_image1()[0]).convert_alpha()
 
 # default movement images
-p1_movement = [pygame.image.load(p1.get_image1()[1]).convert_alpha(), pygame.image.load(p1.get_image1()[2]).convert_alpha()]
-p2_movement = [pygame.image.load(p2.get_image2()[1]).convert_alpha(), pygame.image.load(p2.get_image2()[2]).convert_alpha()]
+p1_movement = [pygame.image.load(p1.get_image1()[1]).convert_alpha(), pygame.image.load(p1.get_image1()[0]).convert_alpha(), pygame.image.load(p1.get_image1()[2]).convert_alpha()]
+p2_movement = [pygame.image.load(p2.get_image2()[1]).convert_alpha(), pygame.image.load(p2.get_image2()[0]).convert_alpha(), pygame.image.load(p2.get_image2()[2]).convert_alpha()]
 
 # movement images if facing the opposite direction of original starting direction
-p1_movement_reversed = [pygame.image.load(p1.get_image2()[1]).convert_alpha(), pygame.image.load(p1.get_image2()[2]).convert_alpha()]
-p2_movement_reversed = [pygame.image.load(p2.get_image1()[1]).convert_alpha(), pygame.image.load(p2.get_image1()[2]).convert_alpha()]
+p1_movement_reversed = [pygame.image.load(p1.get_image2()[1]).convert_alpha(), pygame.image.load(p1.get_image2()[0]).convert_alpha(), pygame.image.load(p1.get_image2()[2]).convert_alpha()]
+p2_movement_reversed = [pygame.image.load(p2.get_image1()[1]).convert_alpha(), pygame.image.load(p2.get_image1()[0]).convert_alpha(), pygame.image.load(p2.get_image1()[2]).convert_alpha()]
 
 # conditions that would trigger different things if set true
 exiting = False
