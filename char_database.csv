@@ -1,0 +1,4 @@
+name,jumping,filepath1,filepath1move1,filepath1move2,filepath2,filepath2move1,filepath2move2,speed,falling,height,width,health
+Chubby-Bird,100,images\bird1.png,images\bird1r1.png,images\bird1r2.png,images\bird2.png,images\bird2l1.png,images\bird2l2.png,2,2,80,80,120
+Legless Wizard,130,images\wizard1.png,images\wizard1.png,images\wizard1.png,images\wizard2.png,images\wizard2.png,images\wizard2.png,2,2,50,70,90
+Stickman,140,images\stickman1.png,images\stickman1r1.png,images\stickman1r2.png,images\stickman2.png,images\stickman2l1.png,images\stickman2l2.png,3,2,60,25,100
