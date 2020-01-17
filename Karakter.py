@@ -5,19 +5,19 @@ class Karakter:
 
     def __init__(self, name: str, jumping: int, filepath1, filepath2, movement_speed, falling_speed=2, height=80, width=80, max_health=100):
         self.__name = name
-        self.max_health = max_health
-        self.__health = max_health
-        self.jumping = jumping
-        self.__coordinate = [0, 0]
-        self.__weapon = None
-        self.__image1 = filepath1
-        self.__image2 = filepath2
-        self.__movement_speed = movement_speed
-        self.__falling_speed = falling_speed
-        self.__direction = "RIGHT"
-        self.height = height
-        self.width = width
-        self.walk_count = 0
+        self.max_health = max_health# the max health of the sprite, remain unchanged throuhgout the game
+        self.__health = max_health# health of each sprites
+        self.jumping = jumping# determines how high it will jump
+        self.__coordinate = [0, 0]# the coordinate of the sprite
+        self.__weapon = None# which weapon it uses (it calls Weapon class)
+        self.__image1 = filepath1# the path of the image of the sprite facing right
+        self.__image2 = filepath2# the path of the image of the sprite facing left
+        self.__movement_speed = movement_speed# determines how fast it moves right or left
+        self.__falling_speed = falling_speed# determines how fast it falls while airborne
+        self.__direction = "RIGHT"# determines which direction the sprite is facing, it can only be "RIGHT" or "LEFT"
+        self.height = height# the height of the sprite, based on the actual size of the image in pixels
+        self.width = width# the width of the sprite, based on the actual size of the image in pixels
+        self.walk_count = 0# used mainly for the walking animation, the value is used as the index number of the image inside the list
 
 
     """
@@ -70,6 +70,7 @@ class Karakter:
     def get_movement_speed(self):
         return self.__movement_speed
 
+    # this is for the movement of each sprite
     def movement(self, direction, x_limit_right, x_limit_left, y_limit_down, y_limit_up=0):
         if direction == "UP" :#lompat
             self.__coordinate[1] -= self.jumping
@@ -98,6 +99,7 @@ class Karakter:
     def init_direction(self, new_direction):
         self.__direction = new_direction
 
+    # used to display this message when the object is being printed, useful during characters options at the beginning
     def __repr__(self):
         string = ""
         string += "Name: " + self.__name + "; "
@@ -108,24 +110,28 @@ class Karakter:
             string += "; Weapon: " + self.__weapon.name
         return string
 
-
+# class for weapon types that's used by each player
 class Weapon:
     def __init__(self, name: str, damage: int, interval, x_speed,  y_speed=0):
         self.name = name
-        self.damage = damage
-        self.fired_bullets = []
-        self.min_fire_interval = interval
-        self.last_shot = 0
-        self.__x_speed = x_speed
-        self.__y_speed = y_speed
-        self.direction = ""
-        self.coordinate = [0, 0]
+        self.damage = damage# how much health will the opponent loses if the bullet of this weapon reaches it
+        self.fired_bullets = []# the list of bullets' coordinates that has been fired
+        self.min_fire_interval = interval# the reload time in seconds, player will have to wait depending of the value of this in seconds before it could fire again
+        self.last_shot = 0# used to make the waiting time during reloading works, if the value of last shot subtracted by the current time in seconds is greater than the reload time, then you will be able to fire again
+        self.__x_speed = x_speed# the speed of the bullets accross the x-axis
+        self.__y_speed = y_speed# determines how vertical the bullet would be when shot while also being horizontal
+        self.direction = ""# determines which direction the bullets will go when being shot, there can only be "RIGHT" or "LEFT". This value is supposed to be the same as the direction of the sprite holding it
+        self.coordinate = [0, 0]# the initial coordinate of the bullet, to get the location of the sprite holding this weapon
 
+    # weapon wil only fire once the reloading time has finished (the value for interval determines how long does the player have to wait in seconds before he could fire again)
     def firing(self, x, y):
         if (time.time() - self.last_shot) > self.min_fire_interval:
             self.fired_bullets.append([x, y])
             self.last_shot = time.time()
 
+    # the coordinate of bullets that had been fired are always being tracked and stored in a list
+    # the bullet speed are applied to make it keep moving across the screen
+    # once it reaches the edge of the screen or the opponent, those bullets will be removed from the list
     def update_bullets_list(self, char_target: Karakter, x_limit):
         idx = 0
         while idx < len(self.fired_bullets):
@@ -152,17 +158,21 @@ class Weapon:
                 char_target.health_lost(self.damage)
             idx += 1
 
+    # this is to set the bullet speed of the weapon type
     def init_bullet_speed(self, x, y=0):
         self.__x_speed = x
         if y != 0:
             self.__y_speed = y
 
+    # to get the bullet speed
     def get_bullet_speed(self):
         return self.__x_speed, self.__y_speed
 
+    # reset the list of fired bullets, especially useful when the game is restarted
     def reset_bullets(self):
         self.fired_bullets = []
 
+    # used to display this message when the object is being printed, useful during weapon type options at the beginning
     def __repr__(self):
         string = ""
         string += "Name: " + self.name + "; "
@@ -171,10 +181,12 @@ class Weapon:
         string += "Travel Speed: " + str(self.__x_speed)
         return string
 
+# this class is a subsclass of weapon
 class Threeway(Weapon):
     def __init__(self, name: str, damage: int, interval, x_speed, y_speed):
         super().__init__(name, damage, interval, x_speed, y_speed)
 
+    # when being fired, 3 bullets will emerge instead of one. one is horizontal, the other is also horizontal while slightly upwards, and the other is slightly downwards
     def firing(self, x, y):
         if (time.time() - self.last_shot) > self.min_fire_interval:
             self.fired_bullets.append([x, y, 'UP'])
@@ -214,11 +226,12 @@ class Threeway(Weapon):
                 char.health_lost(self.damage)
             idx += 1
 
-
+# this is a subsclass of weapon
 class Doublefire(Weapon):
     def __init__(self, name: str, damage: int, interval, x_speed, y_speed=0):
         super().__init__(name, damage, interval, x_speed, y_speed)
 
+    # it fires 2 bullets consecutively everytime you fires
     def firing(self, x, y):
         if (time.time() - self.last_shot) > self.min_fire_interval:
             self.fired_bullets.append([x, y])
@@ -226,10 +239,12 @@ class Doublefire(Weapon):
             self.last_shot = time.time()
 
 
+# this is a subsclass of weapon
 class Quadruplefire(Weapon):
     def __init__(self, name: str, damage: int, interval, x_speed,y_speed=0):
         super().__init__(name, damage, interval, x_speed, y_speed)
 
+    # it fires so many bullets at once, I did this because I want to implement bullets that looked like laser blasters from star wars
     def firing(self, x, y):
         if (time.time() - self.last_shot) > self.min_fire_interval:
             self.fired_bullets.append([x, y])
