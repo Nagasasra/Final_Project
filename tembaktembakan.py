@@ -1,6 +1,7 @@
 import pygame
 import Karakter# a python file created containing custom created classes and its subclasses (if any) with its methods and attributes, most of the functions in the game uses methods/attributes from this
 import csv
+import random
 
 # this function is for displaying characters/weapon types and its attributes
 # used to display available characters/weapon types from the database.csv file
@@ -18,7 +19,7 @@ chars = []
 for each_row in data1_read:
     images1 = [each_row["filepath1"], each_row["filepath1move1"], each_row["filepath1move2"]]
     images2 = [each_row["filepath2"], each_row["filepath2move1"], each_row["filepath2move2"]]
-    new_char = Karakter.Karakter(each_row["name"], int(each_row["jumping"]), images1, images2, int(each_row["speed"]), int(each_row["falling"]), int(each_row["height"]), int(each_row["width"]), int(each_row["health"]))
+    new_char = Karakter.Karakter(each_row["name"], int(each_row["jumping"]), images1, images2, int(each_row["speed"]), int(each_row["falling"]), int(each_row["height"]), int(each_row["width"]), float(each_row["health"]), float(each_row["regen_rate"]))
     chars.append(new_char)
 
 # attacks type list and its attributes are stored in this weap_database.csv file
@@ -124,6 +125,9 @@ how_to_play_button = how_to_play.get_rect(topleft=(screen_width // 2 - how_to_pl
 quitting_button = quitting.get_rect(topleft=(screen_width // 2 - quitting.get_width() // 2, screen_height // 3 + resume.get_height() + restart.get_height() + how_to_play.get_height() + quitting.get_height() + quitting.get_height() // 2))
 ok_button = ok.get_rect(topleft=(screen_width // 2 - ok.get_width(), screen_height - screen_height // 10))
 
+# boxes for inputting texts
+input_box1 = pygame.Rect(screen_width // 2, screen_height - screen_height // 10, screen_width // 30, screen_height // 60)
+
 # displays the screen while also loading png files for the characters and background and put it into variables
 screen = pygame.display.set_mode((screen_width, screen_height))
 background = pygame.image.load(background_image).convert_alpha()
@@ -145,6 +149,13 @@ p2_movement = [pygame.image.load(p2.get_image2()[1]).convert_alpha(), pygame.ima
 p1_movement_reversed = [pygame.image.load(p1.get_image2()[1]).convert_alpha(), pygame.image.load(p1.get_image2()[0]).convert_alpha(), pygame.image.load(p1.get_image2()[2]).convert_alpha()]
 p2_movement_reversed = [pygame.image.load(p2.get_image1()[1]).convert_alpha(), pygame.image.load(p2.get_image1()[0]).convert_alpha(), pygame.image.load(p2.get_image1()[2]).convert_alpha()]
 
+# title of the game
+pygame.display.set_caption("Tembak-Tembakan")
+
+# these is to keep track the last time the sprite switches images
+moving1_end = 0
+moving2_end = 0
+
 # conditions that would trigger different things if set true
 exiting = False
 win = False
@@ -152,6 +163,7 @@ paused = True
 how_to = True
 reversed1 = False# player 1 starts with its default direction which is right
 reversed2 = False# player 2 starts with its default direction which is left
+inputting = False
 
 # this runs as long as the game is not exited/closed
 while not exiting:
@@ -186,6 +198,10 @@ while not exiting:
         # getting rid of projectiles that are out of the screen already, also the ones that hit the target
         p1.get_weapon().update_bullets_list(p2, screen_width)
         p2.get_weapon().update_bullets_list(p1, screen_width)
+
+        # health regenerates slowly for each players, more specifically 1 for each second
+        p1.health_regenerate()
+        p2.health_regenerate()
 
         # movements of characters on screen when holding the key
         # player can move left or right even when airborne as long as it remains on screen
@@ -253,7 +269,6 @@ while not exiting:
         if event.type == pygame.KEYDOWN:
             # if the game isn't paused all these buttons could be clicked
             if paused is False:
-
                 # players can jump infinitely as high as possible as long as it remains on the screen
                 # if there is another player sitting right above you, you can not jump at all
                 # if the other player is right above you but not touching you, you could still jump but you would bump into that other player
@@ -355,13 +370,17 @@ while not exiting:
 
         # showing the walking animations for the player1, else if it's not moving then he'll be just standing there
         if moving1 is True:
-            if p1.walk_count > len(p1_movement) - 1:
-                p1.walk_count = 0
+            moving1_init = pygame.time.get_ticks()
+            if (moving1_init - moving1_end) > 50:
+                if p1.walk_count == 2:
+                    p1.walk_count = 0
+                else:
+                    p1.walk_count += 1
+                moving1_end = pygame.time.get_ticks()
             if reversed1 is False:
                 screen.blit(p1_movement[p1.walk_count], (p1.get_coordinate()[0], p1.get_coordinate()[1]))
             else:
                 screen.blit(p1_movement_reversed[p1.walk_count], (p1.get_coordinate()[0], p1.get_coordinate()[1]))
-            p1.walk_count += 1
         else:
             if reversed1 is False:
                 screen.blit(p1_standing, (p1.get_coordinate()[0], p1.get_coordinate()[1]))
@@ -370,13 +389,17 @@ while not exiting:
 
         # showing the walking animations for the player2, else if it's not moving then he'll be just standing there
         if moving2 is True:
-            if p2.walk_count > len(p2_movement) - 1:
-                p2.walk_count = 0
+            moving2_init = pygame.time.get_ticks()
+            if (moving2_init - moving2_end) > 50:
+                if p2.walk_count == 2:
+                    p2.walk_count = 0
+                else:
+                    p2.walk_count += 1
+                moving2_end = pygame.time.get_ticks()
             if reversed2 is False:
                 screen.blit(p2_movement[p2.walk_count], (p2.get_coordinate()[0], p2.get_coordinate()[1]))
             else:
                 screen.blit(p2_movement_reversed[p2.walk_count], (p2.get_coordinate()[0], p2.get_coordinate()[1]))
-            p2.walk_count += 1
         else:
             if reversed2 is False:
                 screen.blit(p2_standing, (p2.get_coordinate()[0], p2.get_coordinate()[1]))
@@ -386,12 +409,12 @@ while not exiting:
         # these drawn rectangles down below are for the health bar for player1 and player2, with player1's bar positioned on the top left while player2's bar on the top right
         pygame.draw.rect(screen, (100, 100, 100), pygame.Rect(screen_width // 30, screen_height // 20, screen_width // 4, screen_height // 20))
         pygame.draw.rect(screen, (100, 100, 100), pygame.Rect(screen_width - screen_width // 4 - 30, 30, screen_width // 4, screen_height // 20))
-        pygame.draw.rect(screen, (255, 102, 102), pygame.Rect(screen_width // 30, screen_height // 20, screen_width // 4 * p1.get_health() // p1.max_health, screen_height // 20))
-        pygame.draw.rect(screen, (255, 102, 102), pygame.Rect(screen_width - screen_width // 4 - 30, screen_height // 20, screen_width // 4 * p2.get_health() // p2.max_health, screen_height // 20))
+        pygame.draw.rect(screen, (255, 102, 102), pygame.Rect(screen_width // 30, screen_height // 20, screen_width // 4 * int(p1.get_health()) // int(p1.max_health), screen_height // 20))
+        pygame.draw.rect(screen, (255, 102, 102), pygame.Rect(screen_width - screen_width // 4 - 30, screen_height // 20, screen_width // 4 * int(p2.get_health()) // int(p2.max_health), screen_height // 20))
 
         # these are for displaying the corresponding health in numbers located right below its respective bars
-        p1_health = font.render(str(p1.get_health()) + "/" + str(p1.max_health), True, (255, 0, 0))
-        p2_health = font.render(str(p2.get_health()) + "/" + str(p2.max_health), True, (255, 0, 0))
+        p1_health = font.render(str(int(p1.get_health())) + "/" + str(int(p1.max_health)), True, (255, 0, 0))
+        p2_health = font.render(str(int(p2.get_health())) + "/" + str(int(p2.max_health)), True, (255, 0, 0))
         screen.blit(p1_health, (screen_width // 30, screen_height // 10))
         screen.blit(p2_health, (screen_width - 30 - p2_health.get_width(), screen_height // 10))
 
@@ -401,6 +424,7 @@ while not exiting:
     # the game will be halted when paused, you can't move or fire or anything
     # press esc key again to unpause to resume the game
     if paused is True and how_to is False:
+        quitting_button = quitting.get_rect(topleft=(screen_width // 2 - quitting.get_width() // 2, screen_height // 3 + resume.get_height() + restart.get_height() + how_to_play.get_height() + quitting.get_height() + quitting.get_height() // 2))
         screen.blit(pause, (screen_width // 2 - pause.get_width() // 2, screen_height // 3 - pause.get_height() // 2))
         screen.blit(resume, resume_button)
         screen.blit(how_to_play, how_to_play_button)

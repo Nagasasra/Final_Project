@@ -3,7 +3,7 @@ import time
 # this class is used to represent player 1 and player 2's characters
 class Karakter:
 
-    def __init__(self, name: str, jumping: int, filepath1, filepath2, movement_speed, falling_speed=2, height=80, width=80, max_health=100):
+    def __init__(self, name: str, jumping: int, filepath1, filepath2, movement_speed, falling_speed=2, height=50, width=50, max_health=200, regen_rate=1):
         self.__name = name
         self.max_health = max_health# the max health of the sprite, remain unchanged throuhgout the game
         self.__health = max_health# health of each sprites
@@ -18,24 +18,16 @@ class Karakter:
         self.height = height# the height of the sprite, based on the actual size of the image in pixels
         self.width = width# the width of the sprite, based on the actual size of the image in pixels
         self.walk_count = 0# used mainly for the walking animation, the value is used as the index number of the image inside the list
+        self.health_regen_amount = 1# how much health it regenerates everytime
+        self.health_regen_wait = regen_rate# how long this sprite has to wait in seconds before it could regenerate more health
+        self.last_regen = 0# used to get the last time the sprite regenerates health
 
-
-    """
-    this method is to trigger the character to fire
-    doesn't have any parameter
-    doesn't return anything
-    """
     def fire(self):
         if self.__direction == "RIGHT":
             self.__weapon.firing(self.__coordinate[0] + self.width, self.__coordinate[1] + self.height // 2)
         else:
             self.__weapon.firing(self.__coordinate[0], self.__coordinate[1] + self.height // 2)
 
-    """
-    this method is to set the direction whether it's left or right, this affects the directions of the bullets too
-    the parameter is the desired direction, can only be "LEFT" or "RIGHT" (string)
-    doesn't return anything
-    """
     def set_direction(self, new_direction):
         self.init_direction(new_direction)
         self.__weapon.direction = self.__direction
@@ -57,6 +49,14 @@ class Karakter:
         if damage > self.__health:
             damage = self.__health
         self.__health = self.__health - damage
+
+    def health_regenerate(self):
+        if (time.time() - self.last_regen) > self.health_regen_wait:
+            if self.__health + self.health_regen_amount >= self.max_health:
+                self.__health = self.max_health
+            else:
+                self.__health += self.health_regen_amount
+            self.last_regen = time.time()
 
     def get_health(self):
         return self.__health
@@ -103,9 +103,10 @@ class Karakter:
     def __repr__(self):
         string = ""
         string += "Name: " + self.__name + "; "
-        string += "Jumping: " + str(self.jumping) + "; "
+        string += "Jumping Height: " + str(self.jumping) + "; "
         string += "Movement Speed: " + str(self.__movement_speed) + "; "
-        string += "Health: " + str(self.max_health)
+        string += "Max Health: " + str(int(self.max_health)) + "; "
+        string += "Health regeneration (every this second): " + str(self.health_regen_wait)
         if self.__weapon is not None:
             string += "; Weapon: " + self.__weapon.name
         return string
@@ -117,7 +118,7 @@ class Weapon:
         self.damage = damage# how much health will the opponent loses if the bullet of this weapon reaches it
         self.fired_bullets = []# the list of bullets' coordinates that has been fired
         self.min_fire_interval = interval# the reload time in seconds, player will have to wait depending of the value of this in seconds before it could fire again
-        self.last_shot = 0# used to make the waiting time during reloading works, if the value of last shot subtracted by the current time in seconds is greater than the reload time, then you will be able to fire again
+        self.last_shot = 0# used to make the waiting time during reloading works, if the value of current time subtracted by last shot in seconds is greater than the reload time, then you will be able to fire again
         self.__x_speed = x_speed# the speed of the bullets accross the x-axis
         self.__y_speed = y_speed# determines how vertical the bullet would be when shot while also being horizontal
         self.direction = ""# determines which direction the bullets will go when being shot, there can only be "RIGHT" or "LEFT". This value is supposed to be the same as the direction of the sprite holding it
@@ -176,8 +177,8 @@ class Weapon:
     def __repr__(self):
         string = ""
         string += "Name: " + self.name + "; "
-        string += "Damage: " + str(self.damage) + "; "
-        string += "Interval: " + str(self.min_fire_interval) + "; "
+        string += "Damage for every bullet: " + str(self.damage) + "; "
+        string += "Reload Time (in seconds): " + str(self.min_fire_interval) + "; "
         string += "Travel Speed: " + str(self.__x_speed)
         return string
 
@@ -269,3 +270,36 @@ class Quadruplefire(Weapon):
             self.fired_bullets.append([x - 19, y])
             self.fired_bullets.append([x - 20, y])
             self.last_shot = time.time()
+
+# I might add platforms, or I might not, I don't know
+# I just add this class here just in case I want to
+# I honestly don't know whether the game would be more fun or not if there are platforms
+class Platform:
+    def __init__(self, thickness: int, length: int, speed=0):
+        self.thickness = thickness
+        self.length = length
+        self.coordinate = []
+        self.speed = speed
+
+    def set_coordinate(self, x, y):
+        self.coordinate = [x, y]
+
+    def get_coordinate(self):
+        return self.coordinate
+
+    def moving_up_down(self, limit_up, limit_down):
+        if self.coordinate[1] == limit_up:
+            if self.coordinate < limit_down:
+                self.coordinate[1] += self.speed
+        elif self.coordinate[1] == limit_down:
+            if self.coordinate[1] > limit_up:
+                self.coordinate[1] -= self.speed
+
+    def moving_left_right(self, limit_left, limit_right):
+        if self.coordinate[0] == limit_left:
+            if self.coordinate[0] < limit_right:
+                self.coordinate[0] += self.speed
+        elif self.coordinate[0] == limit_right:
+            if self.coordinate[0] > limit_left:
+                self.coordinate[0] -= self.speed
+
