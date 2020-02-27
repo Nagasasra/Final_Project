@@ -125,9 +125,6 @@ how_to_play_button = how_to_play.get_rect(topleft=(screen_width // 2 - how_to_pl
 quitting_button = quitting.get_rect(topleft=(screen_width // 2 - quitting.get_width() // 2, screen_height // 3 + resume.get_height() + restart.get_height() + how_to_play.get_height() + quitting.get_height() + quitting.get_height() // 2))
 ok_button = ok.get_rect(topleft=(screen_width // 2 - ok.get_width(), screen_height - screen_height // 10))
 
-# boxes for inputting texts
-input_box1 = pygame.Rect(screen_width // 2, screen_height - screen_height // 10, screen_width // 30, screen_height // 60)
-
 # displays the screen while also loading png files for the characters and background and put it into variables
 screen = pygame.display.set_mode((screen_width, screen_height))
 background = pygame.image.load(background_image).convert_alpha()
@@ -163,7 +160,6 @@ paused = True
 how_to = True
 reversed1 = False# player 1 starts with its default direction which is right
 reversed2 = False# player 2 starts with its default direction which is left
-inputting = False
 
 # this runs as long as the game is not exited/closed
 while not exiting:
@@ -424,7 +420,6 @@ while not exiting:
     # the game will be halted when paused, you can't move or fire or anything
     # press esc key again to unpause to resume the game
     if paused is True and how_to is False:
-        quitting_button = quitting.get_rect(topleft=(screen_width // 2 - quitting.get_width() // 2, screen_height // 3 + resume.get_height() + restart.get_height() + how_to_play.get_height() + quitting.get_height() + quitting.get_height() // 2))
         screen.blit(pause, (screen_width // 2 - pause.get_width() // 2, screen_height // 3 - pause.get_height() // 2))
         screen.blit(resume, resume_button)
         screen.blit(how_to_play, how_to_play_button)
